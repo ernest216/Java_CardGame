@@ -8,15 +8,25 @@ import java.util.Scanner;
 public class Player{
     private int playerIndex;
     private ArrayList<Card> playerCards;
-    private CardDeck preferredDeck;
+    private Deck drawDeck;
+    private Deck discardDeck;
     private String playerOutput;
 
 
     public Player(int playerIndex) {
         this.playerIndex = playerIndex;
         this.playerCards = new ArrayList<>();
-        this.preferredDeck = decks.get(playerIndex - 1); // Assuming player indices start from 1
+
     }
+
+    /*public void setDrawDeck(Deck drawDeck) {
+        this.drawDeck = drawDeck;
+    }
+
+    public void setDiscardDeck(Deck discardDeck) {
+        this.discardDeck = discardDeck;
+    }*/
+
     /* Logs the current data to a file
      * @throws IOException if an error occurs while writing to the file
      */
@@ -47,6 +57,10 @@ public class Player{
         return this.playerCards;
     }
 
+    public void addCard(Card card) {
+        playerCards.add(card);
+    }
+
 
     /* */
     public void win(int winner) {
@@ -61,4 +75,6 @@ public class Player{
 
 
 }
+
+
 
