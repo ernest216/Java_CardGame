@@ -13,19 +13,19 @@ public class CardGame {
         /**
      * Function to create a player in the game
      * 
-     * @param n  the number of players
+     * @param n  the player number
      */
-    public void createPlayer(int n) {
-        players.add(new Player(n));
+    public void createPlayer(int playerIndex, Deck drawDeck, Deck discardDeck) {
+        players.add(new Player(playerIndex, drawDeck, discardDeck, this));
     }
 
     /**
      * Function to create a card deck in the game
      * 
-     * @param n the card deck number
+     * @param n the deck number
      */
-    public void createDeck(int n) {
-        decks.add(new Deck(n));
+    public void createDeck(int deckIndex) {
+        decks.add(new Deck(deckIndex));
     }
 
     private static int getNumberOfPlayers() throws IOException {
@@ -59,7 +59,7 @@ public class CardGame {
             if (!packFile.exists()) {
                 // If the pack file doesn't exist, create it
                 try (FileWriter fileWriter = new FileWriter(packFile)) {
-                    List<Integer> cardValues = generateRandomCardValues(numPlayers);
+                    ArrayList<Integer> cardValues = generateRandomCardValues(numPlayers);
                     for (int i = 0; i < cardValues.size(); i++) {
                         fileWriter.write(i + "\n");
                     }
@@ -76,9 +76,9 @@ public class CardGame {
     
         return packLocation;
     }
-    
+
     private static List<Integer> generateRandomCardValues(int numPlayers) {
-        List<Integer> cardValues = new ArrayList<>();
+        ArrayList<Integer> cardValues = new ArrayList<>();
 
 
         // Find the laregest value of the pack of cards
@@ -86,7 +86,7 @@ public class CardGame {
 
         // Generate values from 1 to the largest value of the pack of cards
         for (int i = 1; i <= max; i++) {
-            for (i = 1; i <= 4; i++){
+            for (j = 1; j <= 4; j++){
                 cardValues.add(i);
             }
         }
@@ -97,22 +97,59 @@ public class CardGame {
         return cardValues;
     }
 
+    public void startGame(){
+        String packLocation = getPackLocation();
+        int n = getNumberOfPlayers();
+
+        try (Scanner packScanner = new Scanner(new File(packLocation))) {
+        // Create players and decks
+            for (int i = 0; i < n; i++) {
+                createDeck(i + 1);
+            }
+            for (int i = 0; i < n; i++) {
+                // Check if it is the last player
+                if (i != n - 1) {
+                    // Let player discard card to the deck on the right hand side and draw cards from the left
+                    Player player = new Player(i + 1, decks.get(i), decks.get(i + 1), this);
+                    players.add(player);
+                } else {
+                    Player player = new Player(i + 1, decks.get(i), decks.get(0), this);
+                    players.add(player);
+                }
+            }
+            // Distribute hands to players in a round-robin fashion
+            for (int i = 0; i < 4; i++) {
+                for (Player player : players) {
+                    if (packScanner.hasNextInt()) {
+                        int cardValue = packScanner.nextInt();
+                        player.addCard(new Card(cardValue));
+                        // Remove distributed card from the pack
+                        pack.deliverCard();
+                    } else {
+                    // Handle invalid pack (not enough cards)
+                        System.out.println("Invalid pack: Not enough cards for distribution.");
+                        return;
+                    }
+                }
+            }
+
+            
+        }
+    }
+
+
+
 
     public static void main(String[] args) {
         // Get the number of players from the command line
         int numPlayers = getNumberOfPlayers();
 
-        // Get the location of the pack from the command line
-        String packLocation = getPackLocation();
-
         // Create an instance of CardGame
         CardGame cardGame = new CardGame();
-
-        // Initialize players, decks, and distribute cards
-        cardGame.initializeGame(numPlayers, packLocation);
 
         // Start the game
         cardGame.startGame();
     }
 }
+
 
