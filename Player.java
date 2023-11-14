@@ -7,8 +7,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Scanner;
 
-import javax.smartcardio.Card;
-
 public class Player{
     private int playerIndex;
     private ArrayList<Card> playerCards;
@@ -119,12 +117,49 @@ public class Player{
 
     Card cardToDiscard = unwanted.get(0);
 
-    disc.addCardDeck(cardToDiscard);
+    discard.addCardDeck(cardToDiscard);
 
     playerCards.remove(cardToDiscard);
 
-    String discMessage = "Player " + playerIndex + "discards " + cardToDiscard.getValue() + " to deck " + disc.getDeckNum();
+    String discardMessage = "Player " + playerIndex + "discards " + cardToDiscard.getValue() + " to deck " + disc.getDeckNum();
     logs += drawMessage + "\n"
+
+    String message = "Player " + playerIndex + "'s current hand is " + CardAction();
+    logs += message + "\n\n";
+    }
+
+    /* Function that fills player's hand with cards */
+    public void fillHand(Card card) {
+        playerCards.add(card);
+    }
+
+    /* Player class object constructor */
+    public Player(int playerIndex, Pack.CardDeck draw, Pack.CardDeck discard, CardGame game) {
+        this.playerIndex = playerIndex;
+        this.playerCards = new ArrayList<Card>();
+        this.fileName = "player" + playerNum + "_output.txt";
+        this.draw = draw;
+        this.discard = discard;
+        this.game = game;
+        this.winner = 0;
+        this.logs = "";
+    }
+
+    /* Function that runs a player thread to play the game */
+    public void run() {
+        logs += "player " + playerIndex + " initial hand " + cardAction() + "\n\n";
+
+        while (winner == 0) {
+            try {
+                cardDrawDiscard();
+                checkWin();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+
 
     String message = "Player " + playerIndex + "'s current hand is " + CardAction();
     logs += message + "\n\n";
