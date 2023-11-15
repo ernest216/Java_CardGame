@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Scanner;
 
-public class Player{
+public class Player extends Thread {
     private int playerIndex;
     private ArrayList<Card> playerCards;
     private CardDeck preferredDeck;
@@ -100,6 +100,7 @@ public class Player{
     }
 
     /* Synchronised method to draw/discard cards */
+    // Each turn a player draws a card from the top of the deck and discards to the bottom of the deck
     public synchronized void CardAction() throws IOException {
         if (draw.getDeck().size() < 4) {
             return;
@@ -122,7 +123,7 @@ public class Player{
     playerCards.remove(cardToDiscard);
 
     String discardMessage = "Player " + playerIndex + "discards " + cardToDiscard.getValue() + " to deck " + disc.getDeckNum();
-    logs += drawMessage + "\n"
+    logs += drawMessage + "\n";
 
     String message = "Player " + playerIndex + "'s current hand is " + CardAction();
     logs += message + "\n\n";
@@ -149,6 +150,7 @@ public class Player{
     public void run() {
         logs += "player " + playerIndex + " initial hand " + cardAction() + "\n\n";
 
+        //@while there is no winner 
         while (winner == 0) {
             try {
                 cardDrawDiscard();
@@ -157,11 +159,21 @@ public class Player{
                 e.printStackTrace();
             }
         }
-    }
-}
 
+        try {
+            if (winner = playerIndex) {
+                String message = "Player " + playerIndex + " wins" + "\nPlayer " + playerIndex + " exits" + "\nPlayer " + playerIndex + " final hand: " + cardAction();
+                logs += message + "\n";
+            }
 
-    String message = "Player " + playerIndex + "'s current hand is " + CardAction();
-    logs += message + "\n\n";
+            else {
+                String message = "Player " + winner + " has informed " + playerIndex + " that player " + winner + " has won" + "\nPlayer " + playerIndex + " exits" + "\nPlayer " + playerIndex + " final hand: " + cardAction();
+                logs += message + "\n";
+            }
+
+            log();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
