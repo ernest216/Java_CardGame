@@ -114,16 +114,14 @@ public class Player extends Thread {
             }
         }
     
-    Collections.shuffle(unwanted);
+    if (!unwanted.isEmpty()) {
+        Card cardToDiscard = unwanted.get(0)
+        discard.addCardToBottom(CardToDiscard);
+        playerCards.remove(cardToDiscard);
+        String discardMessage = "Player " + playerIndex + "discards " + cardToDiscard.getValue() + " to deck " + disc.getDeckNum(); 
+        logs += drawMessage + "\n";
+    }
 
-    Card cardToDiscard = unwanted.get(0);
-
-    discard.addCardDeck(cardToDiscard);
-
-    playerCards.remove(cardToDiscard);
-
-    String discardMessage = "Player " + playerIndex + "discards " + cardToDiscard.getValue() + " to deck " + disc.getDeckNum();
-    logs += drawMessage + "\n";
 
     String message = "Player " + playerIndex + "'s current hand is " + CardAction();
     logs += message + "\n\n";
@@ -175,5 +173,8 @@ public class Player extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+}
+
     }
 }
