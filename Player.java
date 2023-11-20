@@ -81,7 +81,7 @@ public class Player extends Thread {
         }
         Card n = playerCards.get(0);
         int value = n.getValue();
-        for (int i = 1; i < 4; i++) {
+        for (int i = 0; i < 4; i++) {
             if (value != playerCards.get(i).getValue()) {
                 return;
             }
