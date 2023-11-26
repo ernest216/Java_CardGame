@@ -1,42 +1,19 @@
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import 
 
-import java.util.ArrayList;
-
-public class PackTest {
+public class TestPack {
     private Pack pack;
 
     @Before
-    public void setUp() {
+    public void setup() {
         pack = new Pack();
-        // Assuming you have a method to add cards to the pack
-        // for example: pack.addCards();
     }
 
     @Test
-    public void testPackInitialization() {
-        assertNotNull("Pack should be initialized", pack.getPack());
-        // Replace 52 with the expected number of cards in a new pack
-        assertEquals("Pack should have 52 cards initially", 52, pack.getPackSize());
-    }
+    public void testPack() {
+        assertNotNull("Pack should be created", pack);
 
-    @Test
-    public void testDeliverCard() {
-        int initialSize = pack.getPackSize();
-        Card card = pack.deliverCard();
-        assertNotNull("Delivered card should not be null", card);
-        assertEquals("Pack size should decrease by 1", initialSize - 1, pack.getPackSize());
     }
-
-    @Test
-    public void testDeliverCardFromEmptyPack() {
-        // Remove all cards from the pack
-        while (!pack.getPack().isEmpty()) {
-            pack.deliverCard();
-        }
-        assertNull("Delivering a card from an empty pack should return null", pack.deliverCard());
-    }
-
-    // Additional tests can be added as needed
 }

@@ -6,7 +6,7 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
-public class DeckTest {
+public class TestDeck {
     private Deck deck;
 
     @Before
@@ -16,7 +16,7 @@ public class DeckTest {
 
     @Test
     public void testAddAndGetCard() {
-        Card card = new Card(5);
+        Card card = new Card();
         deck.addCard(card);
 
         ArrayList<Card> currentDeck = deck.getDeck();
