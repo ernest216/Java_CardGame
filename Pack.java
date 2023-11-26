@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 public class Pack {
-    private static ArrayList<Card> pack;
+    private ArrayList<Card> pack;
 
     public Pack() {
         // Initialize your pack and add cards to it

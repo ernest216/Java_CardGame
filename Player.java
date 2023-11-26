@@ -1,38 +1,46 @@
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Scanner;
+
 
 public class Player extends Thread {
     private int playerIndex;
     private ArrayList<Card> playerCards;
-    private CardDeck preferredDeck;
-    private String playerOutput;
+    private Deck draw;
+    private Deck discard;
+    private String file;
+    private CardGame game;
+    private volatile int winner;
 
-
-    public Player(int playerIndex) {
+    /* Player class object constructor */
+    public Player(int playerIndex, Deck draw, Deck discard, CardGame game) {
         this.playerIndex = playerIndex;
-        this.playerCards = new ArrayList<>();
-        this.preferredDeck = decks.get(playerIndex - 1); // Assuming player indices start from 1
+        this.playerCards = new ArrayList<Card>();
+        this.file = "player" + playerIndex + "_output.txt";
+        this.draw = draw;
+        this.discard = discard;
+        this.game = game;
+        this.winner = 0;
+        createLogFile();
     }
+
+    private void createLogFile() {
+        try {
+            FileWriter fileWriter = new FileWriter(file);
+            fileWriter.close(); // Close immediately to create an empty file
+        } catch (IOException e) {
+            e.printStackTrace(); // Handle the exception according to your needs
+        }
+    }
+
     /* Logs the current data to a file
      * @throws IOException if an error occurs while writing to the file
      */
-    public void log() throws IOException {
-       
-        //create a new FileWriter Instance
-        FileWriter newFile = new FileWriter();
-       
-        //Write the log data to the file
-        newFile.write(logs);
-
-
-        //Close the FileWriter
-        newFile.close();
+    public void log(String action) throws IOException {
+        FileWriter fileWriter = new FileWriter(file, true); // Open file in append mode
+        fileWriter.write(action + "\n");
+        fileWriter.close();
     }
 
 
@@ -51,7 +59,7 @@ public class Player extends Thread {
 
 
     /* */
-    public void win(int winner) {
+    public void setWinner(int winner) {
         this.winner = winner;
     }
 
@@ -64,12 +72,12 @@ public class Player extends Thread {
     /* Function that returna string of the values of cards in a player's hand 
      * With format e.g. (1 2 3 4)
     */
-    public String playerCardsTotal() {
-        String playerCardsTotal = "";
+    public String playerHands() {
+        String playerHands = "";
         for (int i=0; i < getPlayerCards().size(); i++) {
-            playerCardsTotal += getPlayerCards().getValue() + " ";
+            playerHands += getPlayerCards().get(i).getValue() + " ";
         }
-        return playerCardsTotal;
+        return playerHands;
     } 
 
     /* Function that checks if player has a winning hand
@@ -88,7 +96,7 @@ public class Player extends Thread {
         }
 
         synchronized(this) {
-            System.out.printIn("Player " + playerIndex + " is the winner");
+            System.out.println("Player " + playerIndex + " wins");
             game.declareWin(playerIndex);
             this.winner = playerIndex;
         }
@@ -105,76 +113,77 @@ public class Player extends Thread {
         if (draw.getDeck().size() < 4) {
             return;
         }
+        // drawing cards and logging the action of players into their own log files 
+        Card card = draw.drawCard();
+        playerCards.add(card);
+        String drawMessage = "Player " + playerIndex + " draws a " + card.getValue() + " from deck " + draw.getDeckIndex();
+        log(drawMessage);
+        
         ArrayList<Card> unwanted = new ArrayList<>();
+        // getting the discard preference of each player
 
         for (int i=0; i<4; i++) {
-            card n = playerCards.get(i);
+            Card n = playerCards.get(i);
             if (n.getValue() != playerIndex) {
                 unwanted.add(n);
             }
         }
+        // Shuffle the unwanted cards to randomly discard
+        Collections.shuffle(unwanted);
     
-    if (!unwanted.isEmpty()) {
-        Card cardToDiscard = unwanted.get(0)
-        discard.addCardToBottom(CardToDiscard);
-        playerCards.remove(cardToDiscard);
-        String discardMessage = "Player " + playerIndex + "discards " + cardToDiscard.getValue() + " to deck " + disc.getDeckNum(); 
-        logs += drawMessage + "\n";
+        if (!unwanted.isEmpty()) {
+            Card cardToDiscard = unwanted.get(0);
+            // add to arraaylist directly to discard
+            discard.addCard(cardToDiscard);
+            playerCards.remove(cardToDiscard);
+            String discardMessage = "Player " + playerIndex + " discards a " + cardToDiscard.getValue() + " to deck " + discard.getDeckIndex(); 
+            log(discardMessage); 
+        }
+        // outputting the current hands of each player into their log file
+        String message = "Player " + playerIndex + " current hand is " + playerHands();
+        log(message);
+
+        checkWin();
     }
 
-
-    String message = "Player " + playerIndex + "'s current hand is " + CardAction();
-    logs += message + "\n\n";
-    }
-
-    /* Function that fills player's hand with cards */
-    public void fillHand(Card card) {
+    
+    public void addCard(Card card) {
         playerCards.add(card);
-    }
-
-    /* Player class object constructor */
-    public Player(int playerIndex, Pack.CardDeck draw, Pack.CardDeck discard, CardGame game) {
-        this.playerIndex = playerIndex;
-        this.playerCards = new ArrayList<Card>();
-        this.fileName = "player" + playerNum + "_output.txt";
-        this.draw = draw;
-        this.discard = discard;
-        this.game = game;
-        this.winner = 0;
-        this.logs = "";
     }
 
     /* Function that runs a player thread to play the game */
     public void run() {
-        logs += "player " + playerIndex + " initial hand " + cardAction() + "\n\n";
+        String initialMessage = "player " + playerIndex + " initial hand " + playerHands() + "\n";
+        try {
+            log(initialMessage);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         //@while there is no winner 
         while (winner == 0) {
             try {
-                cardDrawDiscard();
-                checkWin();
+                CardAction();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
         try {
-            if (winner = playerIndex) {
-                String message = "Player " + playerIndex + " wins" + "\nPlayer " + playerIndex + " exits" + "\nPlayer " + playerIndex + " final hand: " + cardAction();
-                logs += message + "\n";
+            if (winner == playerIndex) {
+                String message = "\nPlayer " + playerIndex + " wins" + "\nPlayer " + playerIndex + " exits" + "\nPlayer " + playerIndex + " final hand: " + playerHands();
+                log(message + "\n");
             }
 
             else {
-                String message = "Player " + winner + " has informed " + playerIndex + " that player " + winner + " has won" + "\nPlayer " + playerIndex + " exits" + "\nPlayer " + playerIndex + " final hand: " + cardAction();
-                logs += message + "\n";
+                String message = "\nPlayer " + winner + " has informed " + playerIndex + " that player " + winner + " has won" + "\nPlayer " + playerIndex + " exits" + "\nPlayer " + playerIndex + " hand: " + playerHands();
+                log(message + "\n");
             }
 
-            log();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 }
 
-    }
-}
+    
