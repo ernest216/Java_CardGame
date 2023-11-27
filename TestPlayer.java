@@ -1,11 +1,15 @@
 import org.junit.*;
 import static org.junit.Assert.*;
 
+import java.io.IOException;
+
+import javax.smartcardio.Card;
+
 public class TestPlayer {
     private Player player1;
     private Player player2;
     private Player player3;
-    private int[] correct1;
+    private int[] cor;
     private Deck deck;
     private Deck invalidDeck;
     private CardGame game;
@@ -33,7 +37,7 @@ public class TestPlayer {
         player1.addCard(n2);
         player1.addCard(n3);
         player1.addCard(n4);
-        correct1 = new int[] {1, 2, 3, 4};
+        cor = new int[] {1, 2, 3, 4};
 
         player2 = new Player(2, deck, deck, game);
         for (int i = 0; i < 4; i++) {
@@ -56,7 +60,7 @@ public class TestPlayer {
     public void testGetPlayerCards() {
         assertEquals(4, player1.getPlayerCards().size());
         for (int i = 0; i < 4; i++) {
-            assertEquals(correct1[i], player1.getPlayerCards().get(i).getValue());
+            assertEquals(cor[i], player1.getPlayerCards().get(i).getValue());
         }
     }
 
@@ -88,16 +92,19 @@ public class TestPlayer {
     }
 
     @Test
-    public void testCardAction() throws IOException {
-        // Test logic for CardAction method
-        // This may require mocking or additional setup to handle interactions with Deck
-    }
-
-    @Test
     public void testAddCard() {
         player1.addCard(new Card(3));
         assertEquals("1 2 3 4 3 ", player1.playerHands());
         player1.getPlayerCards().remove(player1.getPlayerCards().size() - 1); // Removing the last card added
+    }
+
+    @Test
+    public void testCardAction() throws IOException{
+
+        player1.CardAction();
+        assertEquals(deck.getDeck().size(),3);
+        assertEquals(invalidDeck.getDeck().size(),2);
+        assertEquals(player1.elements(),"1 2 3 4 ");
     }
 
     @After
