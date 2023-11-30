@@ -7,13 +7,21 @@ public class Deck extends Pack{
     private int deckIndex;
     private String file;
 
+    /**
+     * Constructs a new deck with the specified index.
+     *
+     * @param deckIndex The index of the deck
+     */
     public Deck(int deckIndex){
         this.deck = new ArrayList<>();
         this.deckIndex = deckIndex;
-        this.file = "deck" + deckIndex + "_output.txt";
-        createLogFile();
+        this.file = "deck" + deckIndex + "_output.txt"; // Create the output file name
+        createLogFile(); // Create an empty log file for the deck
     }
     
+    /**
+     * Creates an empty log file for the deck.
+     */
     private void createLogFile() {
         try {
             FileWriter fileWriter = new FileWriter(file);
@@ -24,31 +32,47 @@ public class Deck extends Pack{
     }
 
 
-    public int getDeckIndex(){
+    /**
+     * Gets the index of the deck.
+     *
+     * @return The index of the deck
+     */
+    public int getDeckIndex() {
         return deckIndex;
     }
 
-    public ArrayList<Card> getDeck(){
+    /**
+     * Gets the list of cards in the deck.
+     *
+     * @return The list of cards in the deck
+     */
+    public ArrayList<Card> getDeck() {
         return deck;
     }
 
-    public void addCard(Card card){
+    /**
+     * Adds a card to the deck.
+     *
+     * @param card The card to add to the deck
+     */
+    public void addCard(Card card) {
         deck.add(card);
     }
 
     /**
-    * Function that takes the top card from the the deck and returns it
-    * 
-    * @return the top card of the card deck
-    */
-    public Card drawCard(){
+     * Draws the top card from the deck.
+     *
+     * @return The top card of the deck
+     */
+    public Card drawCard() {
         Card card = deck.get(0);
         deck.remove(card);
         return card;
     }
+
     /**
-     * Log the current state of the deck to the output file
-     * 
+     * Logs the current state of the deck to the output file.
+     *
      * @throws IOException if an error occurs while writing to the file
      */
     public void logDeck() throws IOException {
@@ -58,9 +82,9 @@ public class Deck extends Pack{
     }
 
     /**
-     * Convert the deck to a string for logging purposes
-     * 
-     * @return string representation of the deck
+     * Converts the deck to a string for logging purposes.
+     *
+     * @return String representation of the deck
      */
     private String deckToString() {
         StringBuilder result = new StringBuilder();
@@ -69,5 +93,4 @@ public class Deck extends Pack{
         }
         return result.toString().trim();
     }
-
 }

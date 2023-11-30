@@ -14,35 +14,64 @@ import java.nio.file.Paths;
 
 public class CardGame {
 
+    // ArrayLists to store players and decks
     private ArrayList<Player> players;
     private ArrayList<Deck> decks;
-        /**
-     * Function to create a player in the game
-     * 
-     * @param n  the player number
-     */
 
-    /**
-     * CardGame class object constructor
+   /**
+     * Constructor for the CardGame class
+     * Initializes the players and decks ArrayLists
      */
     public CardGame() {
         this.players = new ArrayList<Player>();
         this.decks = new ArrayList<Deck>();
     }
 
+    /**
+     * Function that returns every player in the game
+     * 
+     * @return an ArrayList with every player in the game
+     */
+    public ArrayList<Player> getPlayers() {
+        return players;
+    }
+
+    /**
+     * Function that returns every deck in the game
+     * 
+     * @return an ArrayList with every deck in the game
+     */
+    public ArrayList<Deck> getDecks() {
+        return decks;
+    }
+
+
+    /**
+     * Creates a new player in the game
+     *
+     * @param playerIndex Player number
+     * @param drawDeck    Deck from which the player draws cards
+     * @param discardDeck Deck to which the player discards cards
+     */
     public void createPlayer(int playerIndex, Deck drawDeck, Deck discardDeck) {
         players.add(new Player(playerIndex, drawDeck, discardDeck, this));
     }
 
     /**
-     * Function to create a card deck in the game
-     * 
-     * @param n the deck number
+     * Creates a new deck in the game
+     *
+     * @param deckIndex Deck number
      */
     public void createDeck(int deckIndex) {
         decks.add(new Deck(deckIndex));
     }
 
+    /**
+     * Reads the number of players from the user input
+     *
+     * @return Number of players
+     * @throws IOException if there's an issue with input
+     */
     private static int getNumberOfPlayers() throws IOException {
         Scanner scanner = new Scanner(System.in);
         int number = 0;
@@ -67,15 +96,24 @@ public class CardGame {
         return number;
     }
     
-
+    /**
+    * Checks if the pack file is valid.
+    *
+    * @param packLocation Location of the pack file
+    * @param numPlayers   Number of players in the game
+    * @return True if the pack file is valid, false otherwise
+    */
     private static boolean isValidPackFile(String packLocation, int numPlayers) {
         File packFile = new File(packLocation);
+        // Check if the pack file exists, is a file, and has a valid extension
         if (packFile.exists() && packFile.isFile() && isValidFileExtension(packLocation, "txt")) {
             try (BufferedReader reader = new BufferedReader(new FileReader(packLocation))) {
                 String line;
                 int Count = 0;
+                // Read each line from the pack file
                 while ((line = reader.readLine()) != null) {
                     try {
+                        // Parse the line to an integer representing a card value
                         int num = Integer.parseInt(line);
                         if (num <= 0) {
                             System.out.println("ERROR: Pack file contains a non-positive integer");
@@ -87,8 +125,9 @@ public class CardGame {
                         return false;
                     }
                 }
+                // Check if the total number of cards matches the expected count
                 if (Count == numPlayers * 8) {
-                    return true;
+                    return true; // The pack file is valid
                 } else {
                     System.out.println("ERROR: There are not " + 8 * numPlayers + " cards in the pack file");
                     return false;
@@ -103,6 +142,15 @@ public class CardGame {
         }
         
     }
+
+    /**
+     * Gets the location of the pack file from user input
+     *
+     * @param numPlayers Number of players in the game
+     * @return Location of the pack file
+     * @throws IOException if there's an issue with input or file creation
+     */
+
 
     private static String getPackLocation(int numPlayers) throws IOException {
         Scanner scanner = new Scanner(System.in);
@@ -145,17 +193,25 @@ public class CardGame {
         return packLocation;
     }
     
-    /**private static boolean isPackFileExists(String packLocation) {
-        File packFile = new File(packLocation);
-        return packFile.exists();
-    }*/
+    /**
+     * Checks if a file has a valid extension
+     *
+     * @param fileName  Name of the file
+     * @param extension Expected file extension
+     * @return True if the file has a valid extension, false otherwise
+     */
     
     private static boolean isValidFileExtension(String fileName, String extension) {
         // Check if the file has the specified extension
         return fileName.toLowerCase().endsWith("." + extension.toLowerCase());
     }
 
-
+    /**
+     * Generates random card values for the pack
+     *
+     * @param numPlayers Number of players in the game
+     * @return ArrayList of random card values
+     */
     private static ArrayList<Integer> generateRandomCardValues(int numPlayers) {
         ArrayList<Integer> cardValues = new ArrayList<>();
 
@@ -176,6 +232,12 @@ public class CardGame {
         return cardValues;
     }
 
+    /**
+     * Starts the game by creating players, decks, and distributing cards
+     *
+     * @throw
+     * s IOException if there's an issue with file I/O
+     */
     public void startGame() throws IOException{
         int n = getNumberOfPlayers();
         String packLocation = getPackLocation(n);

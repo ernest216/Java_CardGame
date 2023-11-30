@@ -3,7 +3,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-
+/**
+ * Represents a player in the card game.
+ */
 public class Player extends Thread {
     private int playerIndex;
     private ArrayList<Card> playerCards;
@@ -13,7 +15,14 @@ public class Player extends Thread {
     private CardGame game;
     private volatile int winner;
 
-    /* Player class object constructor */
+    /**
+     * Constructs a new player with the specified attributes.
+     *
+     * @param playerIndex Unique identifier for the player
+     * @param draw        The deck from which the player draws cards
+     * @param discard     The deck to which the player discards cards
+     * @param game        Reference to the card game
+     */
     public Player(int playerIndex, Deck draw, Deck discard, CardGame game) {
         this.playerIndex = playerIndex;
         this.playerCards = new ArrayList<Card>();
@@ -25,6 +34,10 @@ public class Player extends Thread {
         createLogFile();
     }
 
+    /**
+     * Creates an empty log file for the player.
+     */
+
     private void createLogFile() {
         try {
             FileWriter fileWriter = new FileWriter(file);
@@ -34,7 +47,10 @@ public class Player extends Thread {
         }
     }
 
-    /* Logs the current data to a file
+    /**
+     * Logs an action to the player's log file.
+     *
+     * @param action The action to be logged
      * @throws IOException if an error occurs while writing to the file
      */
     public void log(String action) throws IOException {
@@ -44,7 +60,9 @@ public class Player extends Thread {
     }
 
 
-    /* Gets the player ID associated with this instance
+    /**
+     * Gets the player ID associated with this instance.
+     *
      * @return the player ID
      */
     public int getPlayerIndex() {
@@ -52,26 +70,43 @@ public class Player extends Thread {
     }
 
 
-    /* Gets  */
+     /**
+     * Gets the cards in the player's hand.
+     *
+     * @return ArrayList of cards in the player's hand
+     */
     public ArrayList<Card> getPlayerCards() {
         return this.playerCards;
     }
 
 
-    /* */
+    /**
+     * Sets the winner of the game.
+     *
+     * @param winner The player number of the winning player
+     */
+
     public void setWinner(int winner) {
         this.winner = winner;
     }
 
 
-    /* */
+    /**
+     * Gets the winner of the game.
+     *
+     * @return The player number of the winner
+     */
     public int getWinner() {
         return winner;
     }
 
-    /* Function that returna string of the values of cards in a player's hand 
-     * With format e.g. (1 2 3 4)
-    */
+    /**
+     * Returns a string of the values of cards in a player's hand.
+     * Format: (1 2 3 4)
+     *
+     * @return A string representation of the player's hand
+     */
+
     public String playerHands() {
         String playerHands = "";
         for (int i=0; i < getPlayerCards().size(); i++) {
@@ -80,8 +115,10 @@ public class Player extends Thread {
         return playerHands;
     } 
 
-    /* Function that checks if player has a winning hand
-     * 
+    /**
+     * Checks if the player has a winning hand.
+     *
+     * @throws IOException if an error occurs while writing to the file
      */
     public void checkWin() throws IOException {
         if (winner !=0) {
@@ -102,13 +139,21 @@ public class Player extends Thread {
         }
     }
 
-    /* toString method to include player information */
+    /**
+     * Returns a string representation of the player including player information.
+     *
+     * @return String representation of the player
+     */
     public String toString() {
         return "Player number is " + getPlayerIndex() + " with current hand " + getPlayerCards();
     }
 
-    /* Synchronised method to draw/discard cards */
-    // Each turn a player draws a card from the top of the deck and discards to the bottom of the deck
+    /**
+     * Synchronized method for drawing and discarding cards.
+     * In each turn, a player draws a card from the top of the deck and discards to the bottom of the deck.
+     *
+     * @throws IOException if an error occurs while writing to the file
+     */
     public synchronized void CardAction() throws IOException {
         if (draw.getDeck().size() < 4) {
             return;
@@ -146,12 +191,19 @@ public class Player extends Thread {
         checkWin();
     }
 
-    
+    /**
+     * Adds a card to the player's hand.
+     *
+     * @param card The card to be added to the player's hand
+     */
     public void addCard(Card card) {
         playerCards.add(card);
     }
 
-    /* Function that runs a player thread to play the game */
+    /**
+     * Runs a player thread to play the game.
+     * This method is executed when the player thread is started.
+     */
     public void run() {
         String initialMessage = "player " + playerIndex + " initial hand " + playerHands() + "\n";
         try {
@@ -170,12 +222,14 @@ public class Player extends Thread {
         }
 
         try {
+            // Check if the player is the winner and log the final message
             if (winner == playerIndex) {
                 String message = "\nPlayer " + playerIndex + " wins" + "\nPlayer " + playerIndex + " exits" + "\nPlayer " + playerIndex + " final hand: " + playerHands();
                 log(message + "\n");
             }
 
             else {
+                // Log the message when informed about another player winning
                 String message = "\nPlayer " + winner + " has informed " + playerIndex + " that player " + winner + " has won" + "\nPlayer " + playerIndex + " exits" + "\nPlayer " + playerIndex + " hand: " + playerHands();
                 log(message + "\n");
             }
